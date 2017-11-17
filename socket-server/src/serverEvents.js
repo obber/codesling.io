@@ -22,14 +22,15 @@ export const serverChanged = ({ io, client, room }, metadata) => {
 export const serverSync = debounce(({ io, client, room }, metadata) => {
   const roomId = room.get('id');
   const text = room.get('text');
-  client
-    .to(roomId)
+  io
+    .in(roomId)
     .emit('server.sync', { metadata, text });
 }, 200);
 
 export const serverLeave = ({ io, room }) => {
+  const roomId = room.get('id');
   io
-    .in(room.get('id'))
+    .in(roomId)
     .emit('server.leave');
 };
 
