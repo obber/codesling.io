@@ -50,10 +50,12 @@ class Sling extends Component {
       );
     });
 
-    this.socket.on('server.sync', ({ text }) => {
+    this.socket.on('server.sync', ({ text, metadata }) => {
       this.synced = false;
       const cursorPosition = this.editor.getCursor();
-      this.editor.setValue(text);
+      console.log('text = ', text);
+      console.log('metadata = ', metadata);
+      this.updateLine(text, metadata);
       this.editor.setCursor(cursorPosition);
     })
 
@@ -68,11 +70,13 @@ class Sling extends Component {
     window.removeEventListener('resize', this.setEditorSize);
   }
 
-  handleTest = () => {
-    this.editor.replaceRange(
-      'h',
-      { line: 0, ch: 3 }
-    );
+  updateLine(text, metadata) {
+    const { from, to } = metadata;
+    text = text.split('\n')[from.line].slice(0, from.ch);
+    this.editor.replaceRange(text, { 
+      line: from.line,
+      ch: 0
+    }, to);
   }
 
   handleChange = (editor, metadata, value) => {
@@ -113,13 +117,6 @@ class Sling extends Component {
           />
         </div>
         <div className="stdout-container">
-          <Button
-            classname="test-btn"
-            text="Test"
-            backgroundColor="red"
-            color="white"
-            onClick={this.handleTest}
-          />
           <Button
             className="run-btn"
             text="Run Code"

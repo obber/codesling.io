@@ -28,7 +28,7 @@ const clientReady = ({ io, client, room }) => {
 
 const clientUpdate = ({ io, client, room }, { text, metadata }) => {
   room.set('text', text);
-  serverSync({ io, room });
+  serverSync({ io, client, room, }, metadata);
   serverChanged({ io, client, room }, metadata);
 };
 

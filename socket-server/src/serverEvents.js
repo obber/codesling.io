@@ -19,12 +19,12 @@ export const serverChanged = ({ io, client, room }, metadata) => {
     .emit('server.changed', { metadata });
 };
 
-export const serverSync = debounce(({ io, room }) => {
+export const serverSync = debounce(({ io, client, room }, metadata) => {
   const roomId = room.get('id');
   const text = room.get('text');
-  io
-    .in(roomId)
-    .emit('server.sync', { text });
+  client
+    .to(roomId)
+    .emit('server.sync', { metadata, text });
 }, 200);
 
 export const serverLeave = ({ io, room }) => {
