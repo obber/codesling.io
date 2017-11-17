@@ -14,9 +14,11 @@ import './Sling.css';
 
 class Sling extends Component {
   state = {
-    text: '',
+    initialText: '',
     stdout: ''
   }
+
+  synced = true;
 
   runCode = () => {
     this.socket.emit('client.run');
@@ -33,12 +35,20 @@ class Sling extends Component {
       this.socket.emit('client.ready');
     });
 
-    this.socket.on('server.initialState', ({ id, text }) => {
-      this.setState({ id, text });
+    this.socket.on('server.initialState', ({ id, text: initialText }) => {
+      this.setState({ id, initialText });
     });
 
-    this.socket.on('server.changed', ({ text }) => {
-      this.setState({ text });
+    this.socket.on('server.changed', ({ metadata }) => {
+      console.log('metadata = ', metadata);
+      const { from, to, text, origin } = metadata;
+      this.synced = false;
+      this.editor.replaceRange(
+        text,
+        from,
+        to,
+        origin
+      );
     });
 
     this.socket.on('server.run', ({ stdout }) => {
@@ -52,9 +62,23 @@ class Sling extends Component {
     window.removeEventListener('resize', this.setEditorSize);
   }
 
-  handleChange = throttle((editor, metadata, value) => {
-    this.socket.emit('client.update', { text: value });
-  }, 250)
+  handleTest = () => {
+    this.editor.replaceRange(
+      'h',
+      { line: 0, ch: 3 }
+    );
+  }
+
+  handleChange = (editor, metadata, value) => {
+    if (this.synced) {
+      this.socket.emit('client.update', { 
+        metadata: metadata,
+        text: value,
+      });
+    } else {
+      this.synced = !this.synced;
+    }
+  }
 
   setEditorSize = throttle(() => {
     this.editor.setSize(null, `${window.innerHeight - 80}px`);
@@ -73,7 +97,7 @@ class Sling extends Component {
         <div className="code-editor-container">
           <CodeMirror
             editorDidMount={this.initializeEditor}
-            value={this.state.text}
+            value={this.state.initialText}
             options={{
               mode: 'javascript',
               lineNumbers: true,
@@ -83,6 +107,13 @@ class Sling extends Component {
           />
         </div>
         <div className="stdout-container">
+          <Button
+            classname="test-btn"
+            text="Test"
+            backgroundColor="red"
+            color="white"
+            onClick={this.handleTest}
+          />
           <Button
             className="run-btn"
             text="Run Code"

@@ -10,12 +10,11 @@ export const serverInitialState = ({ client, room }) => {
   });
 };
 
-export const serverChanged = ({ io, room }) => {
+export const serverChanged = ({ io, client, room }, metadata) => {
   const roomId = room.get('id');
-  const text = room.get('text');
-  io
-    .in(roomId)
-    .emit('server.changed', { text });
+  client
+    .to(roomId)
+    .emit('server.changed', { metadata });
 };
 
 export const serverLeave = ({ io, room }) => {

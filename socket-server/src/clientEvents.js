@@ -25,10 +25,10 @@ const clientReady = ({ io, client, room }) => {
   serverInitialState({ io, client, room });
 };
 
-const clientUpdate = ({ io, client, room }, payload) => {
-  log('client update heard. payload.text = ', payload.text);
-  room.set('text', payload.text);
-  serverChanged({ io, client, room });
+const clientUpdate = ({ io, client, room }, { text, metadata }) => {
+  log('client update heard. payload.metadata = ', metadata);
+  room.set('text', text);
+  serverChanged({ io, client, room }, metadata);
 };
 
 const clientDisconnect = ({ io, room }) => {
