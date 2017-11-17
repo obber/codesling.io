@@ -27,7 +27,6 @@ const clientReady = ({ io, client, room }) => {
 };
 
 const clientUpdate = ({ io, client, room }, { text, metadata }) => {
-  log('client update heard. payload.metadata = ', metadata);
   room.set('text', text);
   serverSync({ io, room });
   serverChanged({ io, client, room }, metadata);

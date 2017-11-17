@@ -51,7 +51,10 @@ class Sling extends Component {
     });
 
     this.socket.on('server.sync', ({ text }) => {
+      this.synced = false;
+      const cursorPosition = this.editor.getCursor();
       this.editor.setValue(text);
+      this.editor.setCursor(cursorPosition);
     })
 
     this.socket.on('server.run', ({ stdout }) => {
