@@ -1,3 +1,5 @@
+import { debounce } from 'lodash';
+
 /**
  *
  *  Server emissions
@@ -16,6 +18,14 @@ export const serverChanged = ({ io, client, room }, metadata) => {
     .to(roomId)
     .emit('server.changed', { metadata });
 };
+
+export const serverSync = debounce(({ io, room }) => {
+  const roomId = room.get('id');
+  const text = room.get('text');
+  io
+    .in(roomId)
+    .emit('server.sync', { text });
+}, 200);
 
 export const serverLeave = ({ io, room }) => {
   io

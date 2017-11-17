@@ -40,7 +40,6 @@ class Sling extends Component {
     });
 
     this.socket.on('server.changed', ({ metadata }) => {
-      console.log('metadata = ', metadata);
       const { from, to, text, origin } = metadata;
       this.synced = false;
       this.editor.replaceRange(
@@ -50,6 +49,10 @@ class Sling extends Component {
         origin
       );
     });
+
+    this.socket.on('server.sync', ({ text }) => {
+      this.editor.setValue(text);
+    })
 
     this.socket.on('server.run', ({ stdout }) => {
       this.setState({ stdout });
